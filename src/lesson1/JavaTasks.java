@@ -5,9 +5,6 @@ import kotlin.NotImplementedError;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-
-import static lesson1.Sorts.mergeSort;
 
 @SuppressWarnings("unused")
 public class JavaTasks {
@@ -126,30 +123,24 @@ public class JavaTasks {
      * 121.3
      */
     static public void sortTemperatures(String inputName, String outputName) {
-        ArrayList<Double> negative = new ArrayList<>();
-        ArrayList<Double> positive = new ArrayList<>();
-        try (FileReader reader = new FileReader(inputName)) {
-            FileWriter writer = new FileWriter(outputName);
-            Scanner scanner = new Scanner(reader);
-            while (scanner.hasNextLine()) {
-                String line = scanner.nextLine();
-                if (Double.parseDouble(line) < 0.0) {
-                    negative.add(Double.parseDouble(line));
-                } else positive.add(Double.parseDouble(line));
+        ArrayList<Double> temperatures = new ArrayList<>();
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(inputName))) {
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                temperatures.add(Double.parseDouble(line));
             }
-            reader.close();
-            scanner.close();
-            double[] sortedPositive = positive.stream().mapToDouble(i -> i).toArray();
-            double[] sortedNegative = negative.stream().mapToDouble(i -> i).toArray();
-            mergeSort(sortedPositive);
-            mergeSort(sortedNegative);
-            for (double negativeElement : sortedNegative) {
-                writer.write(String.valueOf(negativeElement) + "\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        double[] toSort = temperatures.stream().mapToDouble(i -> i).toArray();
+        Sorts.mergeSort(toSort);
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputName))) {
+            for (int i = 0; i < toSort.length; i++) {
+                bufferedWriter.write(String.valueOf(toSort[i]));
+                if (i != toSort.length - 1) {
+                    bufferedWriter.newLine();
+                }
             }
-            for (double positiveElement : sortedPositive) {
-                writer.write(String.valueOf(positiveElement) + "\n");
-            }
-            writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
