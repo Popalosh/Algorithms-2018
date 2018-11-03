@@ -57,6 +57,31 @@ public class Sorts {
         mergeSort(elements, 0, elements.length);
     }
 
+    private static void merge(double[] elements, int begin, int middle, int end) {
+        double[] left = Arrays.copyOfRange(elements, begin, middle);
+        double[] right = Arrays.copyOfRange(elements, middle, end);
+        int li = 0, ri = 0;
+        for (int i = begin; i < end; i++) {
+            if (li < left.length && (ri == right.length || left[li] <= right[ri])) {
+                elements[i] = left[li++];
+            } else {
+                elements[i] = right[ri++];
+            }
+        }
+    }
+
+    private static void mergeSort(double[] elements, int begin, int end) {
+        if (end - begin <= 1) return;
+        int middle = (begin + end) / 2;
+        mergeSort(elements, begin, middle);
+        mergeSort(elements, middle, end);
+        merge(elements, begin, middle, end);
+    }
+
+    public static void mergeSort(double[] elements) {
+        mergeSort(elements, 0, elements.length);
+    }
+
     private static void heapify(int[] elements, int start, int length) {
         int left = 2 * start + 1;
         int right = left + 1;
