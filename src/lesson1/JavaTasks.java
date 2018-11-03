@@ -3,7 +3,6 @@ package lesson1;
 import kotlin.NotImplementedError;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -41,36 +40,27 @@ public class JavaTasks {
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
     static public void sortTimes(String inputName, String outputName) {
-        List<String> content;
-        ArrayList<Integer> list = new ArrayList<>();
-        try {
-            File inputFile = new File(inputName);
-            content = Files.readAllLines(inputFile.toPath());
-            for (String line : content) {
-                String[] time = line.split(":");
-                list.add(Integer.parseInt(time[0]) * 3600 + Integer.parseInt(time[1]) * 60 + Integer.parseInt(time[2]));
+        List<Integer> times = new ArrayList<>();
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(inputName))) {
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                String[] splitedLine = line.split(":");
+                int currentTime = 0;
+                currentTime += Integer.parseInt(splitedLine[0]) * 3600 + Integer.parseInt(splitedLine[1]) * 60 +
+                        Integer.parseInt(splitedLine[2]);
+                times.add(currentTime);
             }
-            int[] array = new int[list.size()];
-            int index = 0;
-            for (int element : list) {
-                array[index] = element;
-                index++;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int[] array = times.stream().mapToInt(i -> i).toArray();
+        Sorts.quickSort(array);
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputName))) {
+            for (int time : array) {
+                bufferedWriter.write(String.format("%02d:%02d:%02d\n", time / 3600,
+                        (time / 60) % 60, time % 60));
             }
-            Sorts.quickSort(array);
-            File outputFile = new File(outputName);
-            BufferedWriter writer = Files.newBufferedWriter(outputFile.toPath());
-            for (int element : array) {
-                StringBuilder outString = new StringBuilder();
-                int[] time = new int[3];
-                time[0] = element / 3600;
-                time[1] = (element - time[0] * 3600) / 60;
-                time[2] = element - time[0] * 3600 - time[1] * 60;
-                for (int otherIndex = 0; otherIndex < 3; otherIndex++)
-                    outString.append(time[otherIndex] < 10 ? "0" + time[otherIndex] + ":" : time[otherIndex] + ":");
-                writer.write(outString.toString().substring(0, outString.toString().length() - 1) + "\n");
-            }
-            writer.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
