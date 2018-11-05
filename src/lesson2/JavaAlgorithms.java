@@ -148,28 +148,22 @@ public class JavaAlgorithms {
     }
 
     private static String getBest(String first, String second) {
-        int[][] matrix = new int[first.length()][];
-
-        int maxLength = 0;
-        int maxI = 0;
-
-        for (int i = 0; i < matrix.length; i++) {
-            matrix[i] = new int[second.length()];
-            for (int j = 0; j < matrix[i].length; j++) {
-                if (first.charAt(i) == second.charAt(j)) {
-                    if (i != 0 && j != 0) {
-                        matrix[i][j] = matrix[i - 1][j - 1] + 1;
-                    } else {
-                        matrix[i][j] = 1;
-                    }
-                    if (matrix[i][j] > maxLength) {
-                        maxLength = matrix[i][j];
-                        maxI = i;
-                    }
+        int start = 0;
+        int max = 0;
+        for (int i = 0; i < first.length(); i++) {
+            for (int j = 0; j < second.length(); j++) {
+                int x = 0;
+                while (first.charAt(i + x) == second.charAt(j + x)) {
+                    x++;
+                    if (((i + x) >= first.length()) || ((j + x) >= second.length())) break;
+                }
+                if (x > max) {
+                    max = x;
+                    start = i;
                 }
             }
         }
-        return first.substring(maxI - maxLength + 1, maxI + 1);
+        return first.substring(start, (start + max));
     }
 
     /**
