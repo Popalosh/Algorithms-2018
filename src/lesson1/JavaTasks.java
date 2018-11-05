@@ -5,7 +5,6 @@ import kotlin.NotImplementedError;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 @SuppressWarnings("unused")
 public class JavaTasks {
@@ -125,10 +124,9 @@ public class JavaTasks {
      */
     static public void sortTemperatures(String inputName, String outputName) {
         ArrayList<Integer> temperatures = new ArrayList<>();
-        try (Scanner scanner = new Scanner(new File(inputName))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(inputName))) {
             String line;
-            while (scanner.hasNextLine()) {
-                line = scanner.nextLine();
+            while ((line = bufferedReader.readLine()) != null) {
                 temperatures.add((int) (Double.parseDouble(line) * 10));
             }
         } catch (IOException e) {
