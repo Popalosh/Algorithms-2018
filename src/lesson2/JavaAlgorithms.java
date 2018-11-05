@@ -2,12 +2,10 @@ package lesson2;
 
 import kotlin.NotImplementedError;
 import kotlin.Pair;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -106,35 +104,14 @@ public class JavaAlgorithms {
      * Х х Х
      */
     static public int josephTask(int menNumber, int choiceInterval) {
-        boolean[] mens = new boolean[menNumber];
-        boolean checker;
-        int counter = 1;
-        int previous = -1;
         if (choiceInterval == 1) return menNumber;
-        for (int men = 0; men < mens.length; men++) {
-            if (!mens[men] && counter < choiceInterval) {
-                counter++;
-            } else {
-                if (!mens[men] && counter == choiceInterval) {
-                    previous = men;
-                    mens[men] = true;
-                    counter = 1;
-                }
-            }
-            if (men == menNumber - 1) {
-                checker = true;
-                for (int i = 0; i < mens.length; i ++){
-                    if (!mens[i]) {
-                        checker = false;
-                        break;
-                    }
-                }
-                if (checker)
-                    return previous + 1;
-                men = -1;
-            }
+        if (menNumber == 1 || (choiceInterval == 2 && menNumber % 2 == 1)) return 1;
+
+        int result = 0;
+        for (int i = 0; i < menNumber; ++i) {
+            result = (result + choiceInterval) % (i + 1);
         }
-        return -1;
+        return result + 1;
     }
 
     /**
@@ -148,28 +125,41 @@ public class JavaAlgorithms {
      * Если имеется несколько самых длинных общих подстрок одной длины,
      * вернуть ту из них, которая встречается раньше в строке first.
      */
-    static public String longestCommonSubstring(String firs, String second) {
-        StringBuilder best = new StringBuilder();
-        StringBuilder substring = new StringBuilder();
-        if (firs.length() < second.length()) {
-            best = getBest(firs, second, best, substring);
-        } else {
-            best = getBest(second, firs, best, substring);
+    static public String longestCommonSubstring(String first, String second) {
+        if (first == null || second == null || first.length() == 0 || second.length() == 0) {
+            return "";
         }
-        return best.toString();
+        if (first.equals(second)) {
+            return first;
+        }
+
+        String best = getBest(first, second);
+        return best;
     }
 
-    @NotNull
-    private static StringBuilder getBest(String firs, String second, StringBuilder best, StringBuilder substring) {
-        ArrayList<String> substrings = new ArrayList<>();
-        for (int index = 0; index < firs.length(); index++) {
-            char element = firs.charAt(index);
-            boolean condition = 0 >= second.indexOf(element);
-            if (condition) {
-//                int ind = second.indexOf(element);
+    private static String getBest(String first, String second) {
+        int[][] matrix = new int[first.length()][];
+
+        int maxLength = 0;
+        int maxI = 0;
+
+        for (int i = 0; i < matrix.length; i++) {
+            matrix[i] = new int[second.length()];
+            for (int j = 0; j < matrix[i].length; j++) {
+                if (first.charAt(i) == second.charAt(j)) {
+                    if (i != 0 && j != 0) {
+                        matrix[i][j] = matrix[i - 1][j - 1] + 1;
+                    } else {
+                        matrix[i][j] = 1;
+                    }
+                    if (matrix[i][j] > maxLength) {
+                        maxLength = matrix[i][j];
+                        maxI = i;
+                    }
+                }
             }
         }
-        return best;
+        return first.substring(maxI - maxLength + 1, maxI + 1);
     }
 
     /**
