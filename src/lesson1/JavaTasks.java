@@ -5,6 +5,7 @@ import kotlin.NotImplementedError;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 @SuppressWarnings("unused")
 public class JavaTasks {
@@ -123,23 +124,21 @@ public class JavaTasks {
      * 121.3
      */
     static public void sortTemperatures(String inputName, String outputName) {
-        ArrayList<Double> temperatures = new ArrayList<>();
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(inputName))) {
+        ArrayList<Integer> temperatures = new ArrayList<>();
+        try (Scanner scanner = new Scanner(new File(inputName))) {
             String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                temperatures.add(Double.parseDouble(line));
+            while (scanner.hasNextLine()) {
+                line = scanner.nextLine();
+                temperatures.add((int) (Double.parseDouble(line) * 10));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        double[] toSort = temperatures.stream().mapToDouble(i -> i).toArray();
+        int[] toSort = temperatures.stream().mapToInt(i -> i).toArray();
         Sorts.mergeSort(toSort);
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(outputName))) {
-            for (int i = 0; i < toSort.length; i++) {
-                bufferedWriter.write(String.valueOf(toSort[i]));
-                if (i != toSort.length - 1) {
-                    bufferedWriter.newLine();
-                }
+        try (FileWriter writer = new FileWriter(new File(outputName))) {
+            for (int element : toSort) {
+                writer.write(String.valueOf(((double) element) / 10) + "\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
