@@ -3,10 +3,10 @@ package lesson2;
 import kotlin.NotImplementedError;
 import kotlin.Pair;
 
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 
 @SuppressWarnings("unused")
@@ -36,25 +36,35 @@ public class JavaAlgorithms {
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
     static public Pair<Integer, Integer> optimizeBuyAndSell(String inputName) {
-        List<String> content;
-        int best = Integer.MAX_VALUE;
-        Pair<Integer, Integer> bestPair = new Pair<>(null, null);
-        try {
-            File inputFile = new File(inputName);
-            content = Files.readAllLines(inputFile.toPath());
-            for (int i = 0; i < content.size(); i++) {
-                for (int j = i + 1; j < content.size(); j++) {
-                    int current = Integer.parseInt(content.get(i)) - Integer.parseInt(content.get(j));
-                    if (current < best) {
-                        best = current;
-                        bestPair = new Pair<>(i + 1, j + 1);
-                    }
-                }
+        ArrayList<Integer> prices = new ArrayList<>();
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(inputName))) {
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                prices.add(Integer.parseInt(line));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return bestPair;
+        int[] array = prices.stream().mapToInt(i -> i).toArray();
+        int profit = maxProfit(array);
+        for (int i = 0; i < array.length; i++) {
+            for (int j = i + 1; j < array.length; j++) {
+                if (array[i] + profit == array[j]) {
+                    return new Pair<>(i + 1, j + 1);
+                }
+            }
+        }
+        return new Pair<>(0, 0);
+    }
+
+    public static int maxProfit(int[] prices) {
+        int min = Integer.MAX_VALUE;
+        int maxProfit = 0;
+        for (int price : prices) {
+            min = Math.min(min, price);
+            maxProfit = Math.max(maxProfit, price - min);
+        }
+        return maxProfit;
     }
 
     /**
