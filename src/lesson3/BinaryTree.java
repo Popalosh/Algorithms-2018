@@ -71,19 +71,19 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
             return true;
         } else {
             T title = (T) o;
-            Node<T> result = remove(root, title);
+            remove(root, title);
             size--;
-            return (result != null);
+            return (contains(o));
         }
     }
 
     public Node<T> remove(Node<T> node, T title) {
         Node<T> trie = node;
-        int comparison = title.compareTo(trie.value);
+        int comparison = title.compareTo(node.value);
         if (comparison < 0) {
             trie.left = remove(trie.left, title);
         } else if (comparison > 0) {
-            trie.right = remove(trie.right, title);
+            trie.right = remove(node.right, title);
         } else if (trie.right != null) {
             trie.value = minimum(trie.right).value;
             trie.right = remove(trie.right, trie.value);
@@ -106,12 +106,12 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         return title;
     }
 
-    private Node<T> maximum(Node<T> title) {
-        if (title.right == null) return title;
-        while (title.right != null) {
-            title = title.right;
+    private Node<T> maximum(Node<T> node) {
+        if (node.right == null) return node;
+        while (node.right != null) {
+            node = node.right;
         }
-        return title;
+        return node;
     }
 
     @Override
@@ -140,16 +140,19 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
         }
     }
 
+    private void setNode(boolean onRight, Node<T> parentNode, Node<T> currentNode) {
+        if (onRight) {
+            parentNode.right = currentNode;
+        } else parentNode.left = currentNode;
+    }
+
     public class BinaryTreeIterator implements Iterator<T> {
 
         private Node<T> current;
-        private Deque<Node<T>> list = new LinkedList<>();
 
         private BinaryTreeIterator() {
-            current = root;
             while (current != null) {
-                list.push(current);
-                current = current.left;
+                current = root;
             }
         }
 
@@ -158,38 +161,118 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
          * Средняя
          */
         private Node<T> findNext() {
-            return list.pop();
-        }
-
-        @Override
-        public boolean hasNext() {
-            return list.isEmpty();
-        }
-
-        @Override
-        public T next() {
-            current = findNext();
-            if (current == null) throw new NoSuchElementException();
-            while (current.right != null) {
-                list.addFirst(current.right);
-                current.right = current.right.left;
+            if (size == 0) return null;
+            if (current == null) {
+                return find(first());
             }
-            return current.value;
-        }
+            if (current.value == last()) return null;
 
-        /**
-         * Удаление следующего элемента
-         * Сложная
-         */
-        @Override
-        public void remove() {
-            if (current != null) {
-                Node<T> toRemove = current;
-                current = findNext();
-                BinaryTree.this.remove(toRemove);
+            if (current.right != null) {
+                Node<T> succsersor = current.right;
+                while (succsersor.left != null) {
+                    if (succsersor.left != null) {
+                        succsersor = succsersor.left;
+                    } else return succsersor;
+                }
+                return succsersor;
+            } else {
+                Node<T> ancestor = null, succsersor = null;
+                if (root != null) {
+                    ancestor = root;
+                    succsersor = root;
+                }
+            while (ancestor != current) {
+                int x = current.value.compareTo(ancestor.value);
+                if (x < 0) {
+                    succsersor = ancestor;
+                    if (ancestor.left != null) {
+                        ancestor = ancestor.left;
+                    } else return null;
+                } else {
+                    ancestor = ancestor.right;
+                }
             }
+            return succsersor;
         }
     }
+
+    @Override
+    public boolean hasNext() {
+        return findNext() != null;
+    }
+
+    @Override
+    public T next() {
+        current = findNext();
+        if (current == null) throw new NoSuchElementException();
+        return current.value;
+    }
+
+    /**
+     * Удаление следующего элемента
+     * Сложная
+     */
+    @Override
+    public void remove() {
+        Node<T> parent = root;
+        Node<T> child = root;
+        boolean onLeft = false;
+        while (child != current) {
+            parent = child;
+            if (child.value.compareTo(current.value) < 0) {
+                child = child.right;
+                onLeft = false;
+            } else {
+                child = child.left;
+                onLeft = true;
+            }
+        }
+        if (current.left == null && current.right == null) {
+            if (current == root) {
+                root = null;
+            } else if (onLeft) parent.left = current.right;
+            else parent.right = current.right;
+        } else if (current.left == null) {
+            if (current == root) {
+                root = current.right;
+            } else if (onLeft) parent.left = current.right;
+            else parent.right = current.right;
+        } else if (current.right == null) {
+            if (current == root) {
+                root = current.left;
+            } else if (onLeft) parent.left = current.left;
+            else parent.right = current.left;
+        } else {
+            Node<T> minimumChild = current.right;
+            Node<T> parentMinChild = minimumChild;
+            while (minimumChild.left != null) {
+                parentMinChild = minimumChild;
+                minimumChild = minimumChild.left;
+            }
+            if (current == root && parentMinChild == minimumChild) {
+                Node<T> rootLeft = root.left;
+                root = minimumChild;
+                minimumChild.left = rootLeft;
+            } else if (current == root && parentMinChild != minimumChild) {
+                parentMinChild.left = minimumChild.right;
+                root = minimumChild;
+                minimumChild.left = current.left;
+                minimumChild.right = current.right;
+            } else if (parentMinChild == minimumChild) {
+                setNode(!onLeft, parent, minimumChild);
+            } else {
+                parentMinChild.left = minimumChild.right;
+                minimumChild.right = current.right;
+                minimumChild.left = current.left;
+                setNode(!onLeft, parent, minimumChild);
+            }
+            minimumChild.left = current.left;
+        }
+        size--;
+        current = findNext();
+    }
+
+}
 
     @NotNull
     @Override
