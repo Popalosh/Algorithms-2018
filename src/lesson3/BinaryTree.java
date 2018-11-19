@@ -181,7 +181,7 @@ public class BinaryTree<T extends Comparable<T>> extends AbstractSet<T> implemen
                     ancestor = root;
                     succsersor = root;
                 }
-            while (ancestor != current) {
+            while (ancestor != current && ancestor != null) {
                 int x = current.value.compareTo(ancestor.value);
                 if (x < 0) {
                     succsersor = ancestor;
