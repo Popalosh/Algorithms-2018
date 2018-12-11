@@ -38,9 +38,11 @@ public class JavaDynamicTasks {
         if (list.size() == 1 || list.size() == 0) {
             return list;
         }
+
         if (list.size() == 2 && list.get(0) < list.get(1)) {
             return list;
         }
+
         int[] indexes = new int[list.size()];
         int[] lengthArray = new int[list.size()];
         for (int i = 0; i < list.size(); i++) {
@@ -53,24 +55,27 @@ public class JavaDynamicTasks {
                 }
             }
         }
+
         int position = 0;
         int length = lengthArray[0];
-
         for (int i = 0; i < list.size(); i++) {
             if (lengthArray[i] > length) {
                 position = i;
                 length = lengthArray[i];
             }
         }
+
         List<Integer> reversedAnswer = new ArrayList<>();
         while (position != -1) {
             reversedAnswer.add(list.get(position));
             position = indexes[position];
         }
+
         List<Integer> answer = new ArrayList<>();
         for (int i = reversedAnswer.size() - 1; i > -1; i--) {
             answer.add(reversedAnswer.get(i));
         }
+
         return answer;
     }
 
