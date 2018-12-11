@@ -2,6 +2,7 @@ package lesson6;
 
 import kotlin.NotImplementedError;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("unused")
@@ -34,7 +35,43 @@ public class JavaDynamicTasks {
      * В примере ответами являются 2, 8, 9, 12 или 2, 5, 9, 12 -- выбираем первую из них.
      */
     public static List<Integer> longestIncreasingSubSequence(List<Integer> list) {
-        throw new NotImplementedError();
+        if (list.size() == 1 || list.size() == 0) {
+            return list;
+        }
+        if (list.size() == 2 && list.get(0) < list.get(1)) {
+            return list;
+        }
+        int[] indexes = new int[list.size()];
+        int[] lengthArray = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            lengthArray[i] = 1;
+            indexes[i] = -1;
+            for (int j = 0; j < i ; j++) {
+                if (list.get(j) < list.get(i) && lengthArray[j] + 1 > lengthArray[i]) {
+                    lengthArray[i] = lengthArray[j] + 1;
+                    indexes[i] = j;
+                }
+            }
+        }
+        int position = 0;
+        int length = lengthArray[0];
+
+        for (int i = 0; i < list.size(); i++) {
+            if (lengthArray[i] > length) {
+                position = i;
+                length = lengthArray[i];
+            }
+        }
+        List<Integer> reversedAnswer = new ArrayList<>();
+        while (position != -1) {
+            reversedAnswer.add(list.get(position));
+            position = indexes[position];
+        }
+        List<Integer> answer = new ArrayList<>();
+        for (int i = reversedAnswer.size() - 1; i > -1; i--) {
+            answer.add(reversedAnswer.get(i));
+        }
+        return answer;
     }
 
     /**
