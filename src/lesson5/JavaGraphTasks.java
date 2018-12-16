@@ -2,6 +2,7 @@ package lesson5;
 
 import kotlin.NotImplementedError;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -94,7 +95,19 @@ public class JavaGraphTasks {
      * Эта задача может быть зачтена за пятый и шестой урок одновременно
      */
     public static Set<Graph.Vertex> largestIndependentVertexSet(Graph graph) {
-        throw new NotImplementedError();
+        Set<Graph.Vertex> result = new HashSet<>(), otherResult = new HashSet<>();
+        Set<Graph.Edge> edges = graph.getEdges();
+
+        for (Graph.Edge edge : edges) {
+            Graph.Vertex begin = edge.getBegin(), end = edge.getEnd();
+            if (result.isEmpty() || !otherResult.contains(begin)) {
+                result.add(begin);
+                otherResult.add(end);
+            } else if (result.contains(edge.getBegin())) {
+                otherResult.add(edge.getEnd());
+            } else result.add(edge.getEnd());
+        }
+        return (result.size() > otherResult.size()) ? result : otherResult;
     }
 
     /**
